@@ -1,14 +1,11 @@
-import request from "supertest";
+import request, {Response} from "supertest";
 import app from '../app';
 import {Category, Word} from '../types';
 import { WORDS_NUMBER } from "../controllers/getWords"; 
 
-export interface TypedResponse extends request.Response{
+interface TypedResponse extends Response{
     body: Word[]
 };
-
-
-
 
 describe('words endpoint', () => {
     let response: TypedResponse;
