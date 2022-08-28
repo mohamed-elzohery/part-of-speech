@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import { Category, Word } from '../types';
 
+// Types
 export interface DataI {
     wordList: Word[],
     scoresList: number[]
@@ -12,11 +13,11 @@ type HasCategory = {
     [key in Category]?: boolean
 }
 
+// Constants
 export const WORDS_NUMBER = 10;
 
-const includedCategoriesArr = Object.values(Category);
 
-// O(n)
+// Helper Function O(n)
 const shuffleArray = (array: any[]) => {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -25,18 +26,20 @@ const shuffleArray = (array: any[]) => {
     return array;
 }
 
-const getWords = async (req: Request, res: Response, next: NextFunction) => {
 
+const getWords = async (req: Request, res: Response, next: NextFunction) => {
+    
     // Reading data from json file
     const data = await fs.readFile(path.join(__dirname, '../../data/TestData.json'));
-
+    
     // Extract wordlist
     const {wordList: allWords}: DataI = JSON.parse(data.toString());
-
+    
     // Shuffle Words Array
     let randomWords: Word[] = shuffleArray(allWords);
-
+    
     // Occurences Checking Object
+    const includedCategoriesArr = Object.values(Category);
     const categoriesObject: HasCategory = includedCategoriesArr.reduce((acc, current) => Object.assign(acc, {[current]: false}), {});
 
     // array for unique words category;

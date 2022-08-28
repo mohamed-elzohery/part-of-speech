@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import getWords from './controllers/getWords';
+import getRank from './controllers/getRank';
 
 // Instantiating Express Instance
 const app = express();
@@ -27,6 +28,7 @@ dotenv.config({path: path.resolve(__dirname + `/config/${process.env.NODE_ENV}.e
 
 // Setting Routes
 app.get('/words', getWords);
+app.post('/rank', getRank);
 
 // Undefined Routes
 app.get("*", (_, res) => res.status(404).end("Route Not Found"));
