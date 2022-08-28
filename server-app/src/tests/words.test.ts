@@ -1,44 +1,45 @@
 import request from "supertest";
 import app from '../app';
-import {Word} from '../../types';
+import {Category, Word} from '../types';
+import { WORDS_NUMBER } from "../controllers/getWords"; 
 
 export interface TypedResponse extends request.Response{
     body: Word[]
 };
 
-describe('words endpoint', async () => {
-    it('is ten', async () => {
-        const response: TypedResponse = await request(app).get('/words');
 
+
+
+describe('words endpoint', () => {
+    let response: TypedResponse;
+    beforeAll(async () => {
+        response = await request(app).get('/words');
         expect(Array.isArray(response.body)).toBeTruthy();
-        expect(response.body.length).toEqual(10);
+    })
+
+    it('has desired length', async () => {
+        expect(response.body.length).toEqual(WORDS_NUMBER);
     });
 
     it('has at least one noun', async () => {
-        const response: TypedResponse = await request(app).get('/words');
-
-        expect(Array.isArray(response.body)).toBeTruthy();
-        expect(response.body.map(({pos}) => pos)).toContain('noun');
+        expect(response.body.map(({pos}) => pos)).toContain(Category.NOUN);
     });
 
     it('has at least one verb', async () => {
-        const response: TypedResponse = await request(app).get('/words');
-
-        expect(Array.isArray(response.body)).toBeTruthy();
-        expect(response.body.map(({pos}) => pos)).toContain('verb');
+        expect(response.body.map(({pos}) => pos)).toContain(Category.VERB);
     });
 
     it('has at least one adjective', async () => {
-        const response: TypedResponse = await request(app).get('/words');
-
-        expect(Array.isArray(response.body)).toBeTruthy();
-        expect(response.body.map(({pos}) => pos)).toContain('adjective');
+        expect(response.body.map(({pos}) => pos)).toContain(Category.ADJECTIVE);
     });
 
     it('has at least one adverb', async () => {
-        const response: TypedResponse = await request(app).get('/words');
+        expect(response.body.map(({pos}) => pos)).toContain(Category.ADVERB);
+    });
 
-        expect(Array.isArray(response.body)).toBeTruthy();
-        expect(response.body.map(({pos}) => pos)).toContain('adverb');
+    it('has no duplicated word', async () => {
+        const idArr = response.body.map(({id}) => id);
+        expect(Array.isArray(response.body) && new Set(idArr).size === idArr.length)
+        .toBeTruthy();
     });
 });

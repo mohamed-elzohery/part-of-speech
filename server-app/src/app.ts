@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import getWords from './controllers/getWords';
 
 // Instantiating Express Instance
 const app = express();
@@ -25,6 +26,7 @@ dotenv.config({path: path.resolve(__dirname + `/config/${process.env.NODE_ENV}.e
 })();
 
 // Setting Routes
+app.get('/words', getWords);
 
 // Undefined Routes
 app.get("*", (_, res) => res.status(404).end("Route Not Found"));
