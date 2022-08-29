@@ -19,7 +19,7 @@ body {
 }
 
 html{
-  font: 62.5%;/* 1rem = 10px (default) */
+  /* font-size: 62.5%;1rem = 10px (default) */
 
   /* COLORS */
   --color-primary: #4267B2;
@@ -66,4 +66,12 @@ button:disabled{
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 48em) {
+    html{
+      font-size: 56.5%;
+    }
 }

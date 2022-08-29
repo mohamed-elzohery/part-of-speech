@@ -1,16 +1,18 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import classes from './QuizScreen.module.css';
 import Spinner from "../../components/spinner/Spinner";
 import { Word, Category } from "../../types";
 import { getWords } from "../../API";
 import Option from "../../components/option/Option";
 import ProgressBar from "../../components/progress-bar/ProgressBar";
+import { ScreenCtx } from "../../context/ScreenContext/ScreenCtx";
+import { UserCTX } from "../../context/UserContext/UserCtx";
 
 const optionsArr = Object.values(Category);
 
-
-
 const QuizScreen = () => {
+    const {openFinal} = useContext(ScreenCtx);
+    const {increaseScore} = useContext(UserCTX);
     const [words, setWords] = useState<Word[]>([]);
     const [selectedOption, setSelectedOption] = useState<Category | null>(null);
     const [isChecked, setIsChecked] = useState(false);
@@ -43,15 +45,17 @@ const QuizScreen = () => {
     const handleCheck = () => {
         if(!selectedOption) return;
         setIsChecked(true);
-        if(currentWord!.pos === selectedOption) setIsRightAnswer(true);
+        if(currentWord!.pos === selectedOption) {
+            setIsRightAnswer(true);
+            increaseScore();
+        };
     }
 
     const handleNext = () => {
-        console.log(currentWordIndex)
+        console.log(currentWordIndex);
+        if(currentWordIndex === words.length - 1) return openFinal();
         if(currentWordIndex !== null) setCurrentWordIndex(prev => ++prev!);
     }
-
-
 
     if(isError) return <p className={classes.error}>Error while fetching data</p>;
 
@@ -69,7 +73,7 @@ const QuizScreen = () => {
         <ProgressBar progress={Math.floor((currentWordIndex! / words.length) * 100)} />
         <div className={classes.bottom}>
             <div className={classes.counter}>Q {currentWordIndex! + 1}/{words.length}</div>
-            {isChecked ? <button onClick={handleNext}>next</button> 
+            {isChecked ? <button onClick={handleNext}>{currentWordIndex === words.length - 1 ? "sumbit answers" : "next"}</button> 
                         : <button disabled={!selectedOption} onClick={handleCheck}>check answer</button>}
             </div>
         </div>;

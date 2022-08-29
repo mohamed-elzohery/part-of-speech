@@ -9,6 +9,7 @@
     align-items: center;
     cursor: pointer;
     padding: 0 2rem;
+    overflow: hidden;
 }
 
 .optionBox.disabled{

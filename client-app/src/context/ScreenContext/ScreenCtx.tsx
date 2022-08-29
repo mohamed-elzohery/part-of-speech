@@ -4,6 +4,7 @@ import ScreenReducer from "./ScreenReducer";
 export enum Actions {
     OPEN_QUIZ = "OPEN_QUIZ",
     OPEN_FINAL = "OPEN_FINAL",
+    OPEN_START = "OPEN_START",
 }
 
 interface Props{
@@ -15,15 +16,15 @@ export interface State {
     isFinalOpen: boolean,
     openQuiz: () => void,
     openFinal: () => void,
+    openStart: () => void,
 }
 
 const initialState = {
     isQuizOpen: false,
     isFinalOpen: false,
-    // isError: false,
-    // isLoading: false,
     openQuiz: () => {},
     openFinal: () => {},
+    openStart: () => {},
 }
 
 export interface Action{
@@ -45,7 +46,12 @@ const ScreenProvider: React.FC<Props> = ({children}) => {
         dispatch({type: Actions.OPEN_FINAL});
     }
 
-    return <ScreenCtx.Provider value={{...state, openQuiz, openFinal}}>
+    const openStart = () => {
+        dispatch({type: Actions.OPEN_START});
+    }
+
+
+    return <ScreenCtx.Provider value={{...state, openQuiz, openFinal, openStart}}>
         {children}
     </ScreenCtx.Provider>
 }
