@@ -33,13 +33,13 @@ const getRank = async (req: Request, res: Response, next: NextFunction) => {
     const {scoresList}: DataI = JSON.parse(data.toString());
 
     // Counting scores less than player score
-    let lessTanCounter = 0;
+    let lessThanCounter = 0;
 
     scoresList.forEach(score => {
-        if(finalScore > score) lessTanCounter++;
+        if(finalScore > score) lessThanCounter++;
     });
 
-    const rank = Math.ceil((lessTanCounter / scoresList.length)
+    const rank = Math.ceil((lessThanCounter / scoresList.length)
                 * maxScore * 100) / maxScore;
 
     res.json({rank});

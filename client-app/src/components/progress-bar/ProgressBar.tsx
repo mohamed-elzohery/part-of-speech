@@ -5,7 +5,7 @@ interface Props {
     progress: number,
 }
 const ProgressBar: React.FC<Props> = ({progress}) => {
-
+  console.log(progress);
     return (
       <div className={classes.container}>
         <div className={classes.progress} style={{width: `${progress}%`}}>

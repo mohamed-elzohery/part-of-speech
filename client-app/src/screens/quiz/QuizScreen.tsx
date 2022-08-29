@@ -14,22 +14,41 @@ const QuizScreen = () => {
     const [words, setWords] = useState<Word[]>([]);
     const [selectedOption, setSelectedOption] = useState<Category | null>(null);
     const [isChecked, setIsChecked] = useState(false);
+    const [isRightAnswer, setIsRightAnswer] = useState(false);
     const [isError, setIsError] = useState(false);
-    const [currentWordIndex, setCurrentWord] = useState<number | null>(null);
+    const [currentWordIndex, setCurrentWordIndex] = useState<number | null>(null);
     const currentWord = currentWordIndex !== null ?  words[currentWordIndex] : null;
 
     useEffect(() => {
         getWords()
             .then(({data}) => {
                 setWords(data);
-                setCurrentWord(0);
+                setCurrentWordIndex(0);
                 setIsError(false);
             })
             .catch(err => setIsError(true))
     } ,[]);
 
+    useEffect(() => {
+        setSelectedOption(null);
+        setIsChecked(false);
+        setIsRightAnswer(false);
+    }, [currentWordIndex])
+
     const handleSelect = (option: Category) => {
+        if(isChecked) return;
         setSelectedOption(option);
+    }
+
+    const handleCheck = () => {
+        if(!selectedOption) return;
+        setIsChecked(true);
+        if(currentWord!.pos === selectedOption) setIsRightAnswer(true);
+    }
+
+    const handleNext = () => {
+        console.log(currentWordIndex)
+        if(currentWordIndex !== null) setCurrentWordIndex(prev => ++prev!);
     }
 
 
@@ -39,13 +58,19 @@ const QuizScreen = () => {
     if(currentWord) return <div className={classes.container}>
         <h1><span>{currentWord.word}</span> is ...</h1>
         {optionsArr.map((option, index) => (
-            <Option isSelected={selectedOption === option} onSelect={handleSelect} option={option} key={index} />
+            <Option 
+                isSelected={selectedOption === option} 
+                onSelect={handleSelect} option={option} 
+                key={index} 
+                isRightAnswer={isRightAnswer}
+                isChecked={isChecked}
+            />
         ))}
-        <ProgressBar progress={Math.floor((currentWordIndex! + 1) / words.length)} />
+        <ProgressBar progress={Math.floor((currentWordIndex! / words.length) * 100)} />
         <div className={classes.bottom}>
             <div className={classes.counter}>Q {currentWordIndex! + 1}/{words.length}</div>
-            {isChecked ? <button>next</button> 
-                        : <button disabled={!selectedOption}>check answer</button>}
+            {isChecked ? <button onClick={handleNext}>next</button> 
+                        : <button disabled={!selectedOption} onClick={handleCheck}>check answer</button>}
             </div>
         </div>;
 

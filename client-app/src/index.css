@@ -25,6 +25,9 @@ html{
   --color-primary: #4267B2;
   --color-primary-light: #83a8f1;
 
+  --color-success: #78AB46;
+  --color-fail: #FF2400;
+
   --color-grey-light: #F5F5F5;
   --color-grey: #f4f0ec;
 
