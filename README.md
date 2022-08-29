@@ -5,15 +5,12 @@ DEVELOPMENT.
 - local development: create a config file (make sure to name it dev.env) in the config folder including you variables in .sample.env. 
 
 ##  Screens
--Start
 ![Start](https://i.ibb.co/DVXCRqR/start-scr.png)
 
--Quiz
 ![Quiz](https://i.ibb.co/Pz5c48P/quiz-scr1.png)
 ![Quiz](https://i.ibb.co/TgcKhK5/quiz-scr2.png)
 ![Quiz](https://i.ibb.co/TmQtVCq/quiz-scr3.png)
 
--Final
 ![Final](https://i.ibb.co/rHQXW61/Final-scr.png)
 
 ## Available Scripts
