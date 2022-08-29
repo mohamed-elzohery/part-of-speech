@@ -8,7 +8,6 @@ import StartScreen from './screens/start/Start';
 
 function App() {
   const { isQuizOpen, isFinalOpen } = useContext(ScreenCtx);
-  console.log(isQuizOpen);
   return (
    <div className={classes.container}>
     <main className={classes.main}>
