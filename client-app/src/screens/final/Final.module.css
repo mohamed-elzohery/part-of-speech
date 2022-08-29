@@ -1,0 +1,38 @@
+.container{
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    row-gap: 3rem;
+    height: 100%;
+}
+
+.container > h1{
+    font-size: 3rem;
+    text-transform: capitalize;
+
+}
+
+.container > p{
+    font-size: 1.6rem;
+    width: 50%;
+    
+}
+
+.container > button{
+    font-size: 2rem;
+    color: #FFF;
+    background-color: var(--color-primary);
+    width: 12rem;
+    height: 4rem;
+    box-shadow: var(--shadow-dark);
+}
+
+.container > button:hover{
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-darker);
+}
+
+.container > button:active{
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-dark);
+}

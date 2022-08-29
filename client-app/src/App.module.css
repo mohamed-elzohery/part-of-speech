@@ -1,4 +1,16 @@
 .container{
-  background-color: blue;
+  background-color: var(--color-grey-light);
   flex: 1;
+
+  display: grid;
+  grid-template-columns: 1fr minmax(40rem, 80rem) 1fr;
+  grid-template-rows: 8rem 1fr 8rem;
+}
+
+.main{
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  background-color: #FFF;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--color-grey);
 }

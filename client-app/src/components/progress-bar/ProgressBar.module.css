@@ -1,0 +1,26 @@
+.container{
+    height: 2rem;
+    width: 90%;
+    background-color: var(--color-grey);
+    border-radius: 5rem;
+    margin-left: 2rem;
+    overflow: hidden;
+}
+
+.progress{
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+}
+
+.label{
+    padding: .5rem;
+    color: #FFF;
+    font-weight: bold;
+    margin-left: auto;
+}
