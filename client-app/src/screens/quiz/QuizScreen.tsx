@@ -1,98 +1,127 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useReducer} from "react";
 import classes from './QuizScreen.module.css';
 import Spinner from "../../components/spinner/Spinner";
 import { Word, Category } from "../../types";
 import { getWords } from "../../API";
 import Option from "../../components/option/Option";
 import ProgressBar from "../../components/progress-bar/ProgressBar";
-import { ScreenCtx } from "../../context/ScreenContext/ScreenCtx";
+import { useContext } from "react";
 import { UserCTX } from "../../context/UserContext/UserCtx";
+import { ScreenCtx } from "../../context/ScreenContext/ScreenCtx";
+
+import QuizReducer from "./QuizReducer";
 
 const optionsArr = Object.values(Category);
 
-const ANSWER_TIME_IN_SECONDS = 30;
+export const ANSWER_TIME_IN_SECONDS = 30;
+
+export enum ActionTypes {
+    LOAD_WORDS = "LOAD_DATA",
+    REPORT_ERROR = "REPORT_ERROR",
+    SUMBIT_ANSWER = "SUMBIT_ANSWER",
+    GO_NEXT = "GO_NEXT",
+    SELECT_OPTION = "SELECT_OPTION",
+    DECREASE_COUNTER = "DECREASE_COUNTER",
+}
+
+export interface StateI {
+    words: Word[],
+    selectedOption: Category | null,
+    isChecked: boolean,
+    isRightAnswer: boolean,
+    isError: boolean,
+    currentWordIndex: number | null,
+    counter: number,
+}
+
+export interface Action {
+    type: ActionTypes,
+    payload?: {
+        words?: Word[],
+        isRight?: boolean,
+        option?: Category
+    }
+}
+
+const initialState = {
+    words: [],
+    selectedOption: null,
+    isChecked: false,
+    isRightAnswer: false,
+    isError: false,
+    currentWordIndex:  null,
+    counter: ANSWER_TIME_IN_SECONDS,
+}
 
 const QuizScreen = () => {
-    // Contexts States
-    const {openFinal} = useContext(ScreenCtx);
+
+    // Context States
     const {increaseScore} = useContext(UserCTX);
+    const {openFinal} = useContext(ScreenCtx);
 
     // States
-    const [words, setWords] = useState<Word[]>([]);
-    const [selectedOption, setSelectedOption] = useState<Category | null>(null);
-    const [isChecked, setIsChecked] = useState(false);
-    const [isRightAnswer, setIsRightAnswer] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [currentWordIndex, setCurrentWordIndex] = useState<number | null>(null);
-    const [counter, setCounter] = useState<number>(ANSWER_TIME_IN_SECONDS);
-    // State-Derived Variables
-    const currentWord = currentWordIndex !== null ?  words[currentWordIndex] : null;
+    const [state, dispatch] = useReducer(QuizReducer, initialState);
 
+    // State-Derived Variables
+    const currentWord = state.currentWordIndex !== null ?  state.words[state.currentWordIndex!] : null;
+
+    // Getting data from server
     useEffect(() => {
         getWords()
             .then(({data}) => {
-                setWords(data);
-                setCurrentWordIndex(0);
-                setIsError(false);
+               dispatch({type: ActionTypes.LOAD_WORDS, payload: {words: data}});
             })
-            .catch(err => setIsError(true))
+            .catch(err => dispatch({type: ActionTypes.REPORT_ERROR}));
     } ,[]);
 
-    useEffect(() => {
-        setSelectedOption(null);
-        setIsChecked(false);
-        setIsRightAnswer(false);
-    }, [currentWordIndex]);
-
+    // Actions Handlers
     const handleSelect = (option: Category) => {
-        if(isChecked) return;
-        setSelectedOption(option);
+        if(state.isChecked) return;
+        dispatch({type: ActionTypes.SELECT_OPTION, payload: {option}});
     }
 
     const handleCheck = () => {
-        if(!selectedOption) return;
-        setIsChecked(true);
-        if(currentWord!.pos === selectedOption) {
-            setIsRightAnswer(true);
-            increaseScore();
-        };
+        if(!state.selectedOption) return;
+        dispatch({type: ActionTypes.SUMBIT_ANSWER, payload: {isRight: currentWord!.pos === state.selectedOption}})
+        if(currentWord?.pos === state.selectedOption) increaseScore();
     }
 
     const handleNext = useCallback(() => {
-        setCounter(ANSWER_TIME_IN_SECONDS);
-        if(currentWordIndex === words.length - 1) return openFinal();
-        if(currentWordIndex !== null) setCurrentWordIndex(prev => ++prev!);
+        dispatch({type: ActionTypes.GO_NEXT});
+        if(state.currentWordIndex === state.words.length - 1) openFinal();
     }
-    ,[currentWordIndex, openFinal, words.length]);
+    ,[state.currentWordIndex, state.words.length, openFinal]);
 
+    // Timer Functionality
     useEffect(() => {
         const timer = setInterval(() => {
-            if(counter === 1) return handleNext();
-            setCounter(prev => --prev);
-        } , 1000)
+            if(state.counter === 1) return handleNext();
+            dispatch({type: ActionTypes.DECREASE_COUNTER});
+        } , 1000);
 
         return () => clearInterval(timer);
-    }, [counter, handleNext]);
+    }, [state.counter, handleNext]);
 
-    if(isError) return <p className={classes.error}>Error while fetching data</p>;
+
+    if(state.isError) return <p className={classes.error}>Error while fetching data</p>;
 
     if(currentWord) return <div className={classes.container}>
         <h1><span>{currentWord.word}</span> is ...</h1>
         {optionsArr.map((option, index) => (
             <Option 
-                isSelected={selectedOption === option} 
+                isSelected={state.selectedOption === option} 
                 onSelect={handleSelect} option={option} 
                 key={index} 
-                isRightAnswer={isRightAnswer}
-                isChecked={isChecked}
+                isRightAnswer={state.isRightAnswer}
+                isChecked={state.isChecked}
             />
         ))}
-        <span className={`${classes.counter} ${counter < 10 ? classes.danger : ''}`}>00:{counter.toString().padStart(2,'0')}</span>
-        <ProgressBar progress={Math.floor((currentWordIndex! / words.length) * 100)} />
+        <span className={`${classes.counter} ${state.counter < 10 ? classes.danger : ''}`}>00:{state.counter.toString().padStart(2,'0')}</span>
+        <ProgressBar progress={Math.floor((state.currentWordIndex! / state.words.length) * 100)} />
         <div className={classes.bottom}>
-            <div className={classes.counter}>Q {currentWordIndex! + 1}/{words.length}</div>
-            {isChecked ? <button onClick={handleNext}>{currentWordIndex === words.length - 1 ? "sumbit quiz" : "next"}</button> 
-                        : <button disabled={!selectedOption} onClick={handleCheck}>sumbit answer</button>}
+            <div className={classes.counter}>Q {state.currentWordIndex! + 1}/{state.words.length}</div>
+            {state.isChecked ? <button onClick={handleNext}>{state.currentWordIndex === state.words.length - 1 ? "sumbit quiz" : "next"}</button> 
+                        : <button disabled={!state.selectedOption} onClick={handleCheck}>sumbit answer</button>}
             </div>
         </div>;
 
